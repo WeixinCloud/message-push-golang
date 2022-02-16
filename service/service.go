@@ -22,6 +22,14 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, data)
 		return
 	} else if r.Method == http.MethodPost {
+		// 没有x-wx-source头的，不是微信的来源，不处理
+		sourceKey := http.CanonicalHeaderKey("x-wx-source")
+		source := r.Header[sourceKey]
+		if len(source) <= 0 {
+			w.WriteHeader(400)
+			fmt.Fprintf(w, "Invalid request source")
+			return
+		}
 
 		openIDKey := http.CanonicalHeaderKey("x-wx-openid")
 		openID := r.Header[openIDKey]
